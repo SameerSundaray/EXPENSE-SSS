@@ -1,0 +1,61 @@
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import "./ForgotPassword.css";
+
+const ForgotPassword = ({ setForgotPassword }) => {
+  const [email, setEmail] = useState('');
+  const navigate = useNavigate();
+
+  const emailChangeHandler = (event) => {
+    setEmail(event.target.value);
+  };
+
+  const SendLinkHandler = async () => {
+    try {
+      const response = await fetch('https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=AIzaSyCWK-6BYgWzzK-6jzvxpgkwkWDbdJHAwxc', {
+        method: 'POST',
+        body: JSON.stringify({
+          requestType: 'PASSWORD_RESET',
+          email: email
+        }),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send link. Please try again.');
+      }
+
+      const data = await response.json();
+      console.log(data);
+      alert('Successfully Sent Link to Registered E-mail');
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
+  const GoBackHandler = () => {
+    setForgotPassword(false);
+  };
+
+  return (
+    <div className="container">
+      <form>
+        <div className="form-group">
+          <label htmlFor="email">Enter Registered E-mail</label>
+          <input
+            type="email"
+            id="email"
+            value={email}
+            onChange={emailChangeHandler}
+          />
+        </div>
+        <button type="button" onClick={SendLinkHandler}>Send Link</button>
+        <button type="button" onClick={GoBackHandler}>Go Back</button>
+      </form>
+    </div>
+  );
+};
+
+export default ForgotPassword;
